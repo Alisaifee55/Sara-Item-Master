@@ -9,7 +9,6 @@ Built from `docs/original-spec.md` and `docs/validator-logic.md` — those
 files are the source of truth for the business rules; this README covers
 setup and deployment only.
 
-
 ## Stack
 - React + Vite, deployed as a static site (Cloudflare Pages).
 - [ExcelJS](https://github.com/exceljs/exceljs) for reading/writing `.xlsx`
