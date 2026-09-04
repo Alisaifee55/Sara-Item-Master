@@ -1,0 +1,14 @@
+{
+  "name": "Item Master Validator — Sara Plaza Trading Co.",
+  "short_name": "Sara Validator",
+  "description": "Validate item-list workbooks against the live master and download the corrected file.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5ead8",
+  "theme_color": "#f9f4ed",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

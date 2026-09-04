@@ -1,0 +1,261 @@
+:root {
+  /* Ground / surface / text */
+  --ground: #f5ead8;
+  --surface: #ebddc5;
+  --text: #201e1d;
+  --divider: rgba(32, 30, 29, 0.16);
+
+  /* Accent (terracotta) ramp 100→900 */
+  --accent-100: #fff2eb;
+  --accent-200: #ffe1d0;
+  --accent-300: #ffc6a5;
+  --accent-400: #f6a06b;
+  --accent-500: #d67f48;
+  --accent-600: #b2622d;
+  --accent: #c67139;
+  --accent-700: #8c491a;
+  --accent-800: #643312;
+  --accent-900: #402310;
+
+  /* Accent-2 (sage) ramp 100→900 */
+  --sage-100: #f0fae1;
+  --sage-200: #e1eecc;
+  --sage-300: #ccdbb2;
+  --sage-400: #aebf92;
+  --sage-500: #8fa073;
+  --sage-600: #728157;
+  --sage: #7a8a5e;
+  --sage-700: #56633f;
+  --sage-800: #3d472b;
+  --sage-900: #272e1b;
+
+  /* Neutral ramp 100→900 */
+  --n-100: #f9f4ed;
+  --n-200: #eee7db;
+  --n-300: #dcd3c4;
+  --n-400: #c0b6a5;
+  --n-500: #a19786;
+  --n-600: #82796a;
+  --n-700: #645c50;
+  --n-800: #474238;
+  --n-900: #2e2b25;
+
+  /* Functional fill colours — fixed, not theme colours */
+  --fill-not-master: #e8836f;
+  --fill-case: #c07fc9;
+  --fill-space: #e8c65c;
+  --fill-formula: #9dc98a;
+
+  /* Excel ARGB equivalents (used only in comments / lib code) */
+
+  /* Spacing scale */
+  --sp-1: 4.4px;
+  --sp-2: 8.8px;
+  --sp-3: 13.2px;
+  --sp-4: 17.6px;
+  --sp-5: 26.4px;
+  --sp-6: 35.2px;
+
+  /* Radii */
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 28px;
+  --r-pill: 999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(46, 43, 37, 0.14);
+  --shadow-md: 0 3px 10px rgba(46, 43, 37, 0.16);
+  --shadow-lg: 0 12px 32px rgba(46, 43, 37, 0.22);
+
+  --font-heading: 'Caprasimo', serif;
+  --font-body: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- shared primitives ---- */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--n-200);
+  color: var(--n-700);
+  align-self: flex-start;
+}
+
+.tag-accent-2 {
+  background: var(--sage-200);
+  color: var(--sage-800);
+}
+
+.tag-accent {
+  background: var(--accent-200);
+  color: var(--accent-800);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 12px 22px;
+  font-size: 14.5px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-600);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--n-100);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--n-700);
+  border: 1.5px solid var(--divider);
+}
+
+.btn-ghost:hover {
+  background: var(--n-200);
+}
+
+.card {
+  background: var(--n-100);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.fade-in {
+  animation: sara-fade-in 0.48s ease both;
+}
+
+@keyframes sara-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sara-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes sara-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sara-halo {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes sara-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breathe,
+  .halo,
+  .spin-slow,
+  .status-dot {
+    animation: none !important;
+  }
+}
