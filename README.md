@@ -70,6 +70,47 @@ gas/Code.gs         Apps Script backend (doGet) — copy into Apps Script, see a
 docs/               original spec + validation-logic reference docs
 ```
 
+## Live Conditional Formatting in the exported file
+On top of the static fills (which record "the tool touched/flagged this cell
+at export time"), every downloaded workbook also gets real Excel
+**Conditional Formatting** rules for all five checks — not-in-master, case
+mismatch, whitespace, BARCODE/ITEMNAME formula drift, and the BARCODE
+`>12` character length rule. These re-evaluate live: if Sara edits a cell in
+Excel afterward, the highlight updates or clears itself automatically, with
+no macro and no need to re-run the tool.
+
+**How it works:** `src/lib/conditionalFormat.js` writes two hidden reference
+sheets into the workbook — `_SaraMaster` (a snapshot of each checked
+column's master list) and `_SaraCodes` (the colour/size code tables) — and
+defines named ranges over them (`Master_UFCOLOR`, `ColorCodeTable`, etc.).
+Each checked column then gets Excel formula-based CF rules that reference
+those named ranges, e.g. `=AND($F2<>"",COUNTIF(Master_UFCOLOR,$F2)=0)` for
+"not in master." The BARCODE/ITEMNAME formula-drift rules recompute the same
+concatenation formula from `validate.js` inline, using `VLOOKUP` against the
+code tables.
+
+**BARCODE/ITEMNAME auto-corrected cells keep both layers deliberately:** the
+static light-green fill stays as the permanent record of "the tool corrected
+this at export," while a *separate* live CF rule on the same cell watches for
+future drift — if Sara later edits UFBRAND/UFNAME/UFCOLOR/UFSIZE and the
+value stops matching the formula, it lights up again independently of the
+static fill underneath.
+
+**Known tradeoffs, by design:**
+- The embedded master/code data is a **snapshot at download time**. If the
+  live Google Sheet changes afterward, a previously-downloaded file's live
+  checks still reflect what was true when it was exported, not the current
+  master. Only the on-screen change log (generated at upload time) reflects
+  the truly live master.
+- CF ranges extend 200 rows past the current data (capped at 3,000 total) so
+  rows added by hand later keep working, without unbounded recalculation
+  cost on very large files.
+- This duplicates the master/whitespace/formula business rules in two places
+  (JS in `validate.js` and Excel formulas in `conditionalFormat.js`) that
+  must be kept in sync if the rules ever change — verified end-to-end against
+  real files using LibreOffice headless recalculation during development,
+  but worth re-testing the same way after any change to either file.
+
 ## Notes on fidelity to the design handoff
 - The processing screen runs real validation up front (fast even on large
   sheets) and then walks the eleven-step script with the true per-step

@@ -4,6 +4,7 @@ import { FILL_KINDS } from '../lib/constants.js';
 function hint(kind, counts, byColumn) {
   if (kind === 'space') return 'UFBRAND · UFMODELNO';
   if (kind === 'formula') return 'overwritten with formula result';
+  if (kind === 'tooLong') return 'BARCODE over 12 characters';
   const cols = Object.entries(byColumn).filter(([, c]) => c[kind] > 0).length;
   return `across ${cols} column${cols === 1 ? '' : 's'}`;
 }

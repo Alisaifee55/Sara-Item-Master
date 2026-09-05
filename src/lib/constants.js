@@ -32,8 +32,17 @@ export const FILL_KINDS = {
   notMaster: { label: 'Not in master', chip: '#e8836f', argb: 'FFF08080' },
   caseMismatch: { label: 'Case mismatch', chip: '#c07fc9', argb: 'FFDA70D6' },
   space: { label: 'Whitespace issue', chip: '#e8c65c', argb: 'FFFFD966' },
-  formula: { label: 'Auto-filled / corrected', chip: '#9dc98a', argb: 'FFC6EFCE' }
+  formula: { label: 'Auto-filled / corrected', chip: '#9dc98a', argb: 'FFC6EFCE' },
+  tooLong: {
+    label: 'Barcode too long (>12 chars)',
+    chip: '#8b0000',
+    argb: 'FF8B0000',
+    fontArgb: 'FFFFFFFF' // white text — the only category that needs it, dark red is too dark otherwise
+  }
 };
+
+/** Cells longer than this are flagged — matches the physical barcode label limit. */
+export const BARCODE_MAX_LENGTH = 12;
 
 // The processing-screen step script (see README §Screens 2). Steps 3–7 group
 // columns for legibility; the runtime emits real counts as each finishes.
@@ -64,5 +73,6 @@ export const STEP_SCRIPT = [
   },
   { id: 'barcode', label: 'Auto-filling BARCODE' },
   { id: 'itemname', label: 'Auto-filling ITEMNAME' },
-  { id: 'write', label: 'Applying fills and writing workbook' }
+  { id: 'toolong', label: 'Checking BARCODE length' },
+  { id: 'write', label: 'Applying fills, formatting rules, and writing workbook' }
 ];

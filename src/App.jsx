@@ -149,7 +149,7 @@ export default function App() {
 
   function animateSteps(validationResult, parsed) {
     let i = 0;
-    const cumulative = { notMaster: 0, caseMismatch: 0, space: 0, formula: 0 };
+    const cumulative = { notMaster: 0, caseMismatch: 0, space: 0, formula: 0, tooLong: 0 };
 
     const stepDurations = STEP_SCRIPT.map((s) => (s.id === 'read' || s.id === 'master' ? 550 : 420));
 
@@ -174,6 +174,10 @@ export default function App() {
         const colCounts = validationResult.byColumn[col];
         if (colCounts) cumulative.formula += colCounts.formula;
       }
+      if (step.id === 'toolong') {
+        const colCounts = validationResult.byColumn.BARCODE;
+        if (colCounts) cumulative.tooLong += colCounts.tooLong;
+      }
       setStepIndex(i);
       setLiveCounts({ ...cumulative });
       i += 1;
@@ -188,7 +192,10 @@ export default function App() {
       parsed.worksheet,
       validationResult.edits,
       validationResult.changes,
-      validationResult.headerIndex
+      validationResult.headerIndex,
+      master.masters,
+      master.codes,
+      parsed.rows.length - 1
     );
     const filename = buildOutputFilename();
     setResult({ ...validationResult, totalRows: parsed.rows.length - 1 });

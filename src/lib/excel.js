@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { FILL_KINDS } from './constants.js';
+import { addLiveConditionalFormatting } from './conditionalFormat.js';
 
 /** Thrown when the workbook can't be parsed at all — corrupt / password-protected / not really .xlsx. */
 export class UnreadableWorkbookError extends Error {}
@@ -58,8 +59,20 @@ function cellToString(v) {
  * @param {Record<number, Record<number,string>>} edits - dataRowIdx -> {colIdx: value}
  * @param {Array<{row:number, column:string, kind:string}>} changes - 1-based sheet row, header name, fill kind
  * @param {Record<string,number>} headerIndex - header name -> 0-based column index
+ * @param {Record<string,string[]>} masters - needed to build the live-CF hidden reference sheets
+ * @param {{color: Record<string,string>, size: Record<string,string>}} codes
+ * @param {number} totalDataRows - how many data rows the CF ranges should cover
  */
-export async function applyChangesAndExport(workbook, worksheet, edits, changes, headerIndex) {
+export async function applyChangesAndExport(
+  workbook,
+  worksheet,
+  edits,
+  changes,
+  headerIndex,
+  masters,
+  codes,
+  totalDataRows
+) {
   // 1. Write formula-corrected values.
   for (const [rowIdxStr, colEdits] of Object.entries(edits)) {
     const dataRowIdx = Number(rowIdxStr);
@@ -97,6 +110,12 @@ export async function applyChangesAndExport(workbook, worksheet, edits, changes,
         fgColor: { argb }
       }
     };
+  }
+
+  // 3. Live Conditional Formatting — re-evaluates on every recalculation, so
+  // edits made later in Excel update or clear these highlights on their own.
+  if (masters && codes) {
+    addLiveConditionalFormatting(workbook, worksheet, headerIndex, masters, codes, totalDataRows || 0);
   }
 
   const buffer = await workbook.xlsx.writeBuffer();

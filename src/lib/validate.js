@@ -4,7 +4,8 @@ import {
   WHITESPACE_CHECKED_COLUMNS,
   REQUIRED_FORMULA_COLUMNS,
   BARCODE_COL,
-  ITEMNAME_COL
+  ITEMNAME_COL,
+  BARCODE_MAX_LENGTH
 } from './constants.js';
 
 const SPACE_ISSUE_RE = /^\s|\s$|\s{2,}/;
@@ -104,13 +105,13 @@ export function runValidation(rows, masters, codes, onStep) {
   const dataRows = rows.slice(1);
 
   const changes = [];
-  const counts = { notMaster: 0, caseMismatch: 0, space: 0, formula: 0 };
-  const byColumn = {}; // header -> { notMaster, caseMismatch, space, formula }
+  const counts = { notMaster: 0, caseMismatch: 0, space: 0, formula: 0, tooLong: 0 };
+  const byColumn = {}; // header -> { notMaster, caseMismatch, space, formula, tooLong }
   const flaggedCells = new Set(); // `${row}|${column}` already flagged by the master/whitespace pass
 
   const bump = (col, kind) => {
     counts[kind]++;
-    if (!byColumn[col]) byColumn[col] = { notMaster: 0, caseMismatch: 0, space: 0, formula: 0 };
+    if (!byColumn[col]) byColumn[col] = { notMaster: 0, caseMismatch: 0, space: 0, formula: 0, tooLong: 0 };
     byColumn[col][kind]++;
   };
 
@@ -241,6 +242,25 @@ export function runValidation(rows, masters, codes, onStep) {
     }
   }
   onStep && onStep({ id: 'itemname' }, counts);
+
+  // --- 4. BARCODE length check — runs against the *final* value: whatever
+  // was just auto-filled above, or the original value if it was left alone. ---
+  if (barcodeIdx !== undefined) {
+    for (let r = 0; r < dataRows.length; r++) {
+      const finalValue = edits[r][barcodeIdx] !== undefined ? edits[r][barcodeIdx] : getCell(r, BARCODE_COL);
+      if (finalValue.length > BARCODE_MAX_LENGTH) {
+        bump(BARCODE_COL, 'tooLong');
+        changes.push({
+          row: r + 2,
+          column: BARCODE_COL,
+          kind: 'tooLong',
+          oldValue: finalValue,
+          newValue: undefined
+        });
+      }
+    }
+  }
+  onStep && onStep({ id: 'toolong' }, counts);
 
   return {
     headerIndex,
