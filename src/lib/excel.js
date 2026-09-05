@@ -71,16 +71,31 @@ export async function applyChangesAndExport(workbook, worksheet, edits, changes,
   }
 
   // 2. Apply fills.
+  //
+  // IMPORTANT: workbooks exported from tools like Google Sheets often give
+  // every cell in a row the *same style object by reference* (a shared XF
+  // record) rather than one style per cell. `cell.fill = {...}` mutates
+  // whatever style object the cell currently points to — if that object is
+  // shared, every other cell pointing at it gets the fill too, silently
+  // colouring the entire row instead of the one cell that changed.
+  //
+  // The fix is to always give the touched cell its own style object first,
+  // by spreading its current style into a new one before touching `.fill`.
+  // This breaks the shared reference for that cell only; every other cell
+  // still points at the original (untouched) shared style.
   for (const change of changes) {
     const colIdx = headerIndex[change.column];
     if (colIdx === undefined) continue;
     const argb = FILL_KINDS[change.kind]?.argb;
     if (!argb) continue;
     const cell = worksheet.getRow(change.row).getCell(colIdx + 1);
-    cell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb }
+    cell.style = {
+      ...cell.style,
+      fill: {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb }
+      }
     };
   }
 
